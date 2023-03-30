@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Cart;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -13,9 +15,65 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::all();
-    
-        //dd($products);
-        return view('products.create',['products' => $products]);
+
+        $user_id =  Auth::id();
+
+        $cart = Cart::where('user_id', '=', $user_id)->get('product_id');
+        //return $cart;
+        preg_match_all('!\d+!', $cart, $matches);
+        
+        //print("<pre>".print_r($matches,true)."</pre>");
+        foreach($matches as $match){
+            $count =Cart::where('user_id','=', $user_id)
+                ->update([
+                'count'=> DB::raw('count+1'), 
+            ]);
+        }
+
+        return view('index',['count'=> $count, 'products' => $products]);
+    }
+
+
+    function addToCart(Request $request)
+    {
+        
+        if(isset($_GET["productId"]) )
+        {
+            $user_id =  Auth::id();
+
+            $product_id= $_GET["productId"];
+
+            
+
+            Cart::create([
+                'user_id' =>$user_id,
+                'product_id' => $product_id,
+            ]);
+
+            $products = Product::all();
+
+            $user_id =  Auth::id();
+
+            $cart = Cart::where('user_id', '=', $user_id)->get('product_id');
+            
+            preg_match_all('!\d+!', $cart, $matches);
+            
+            
+            foreach($matches as $match){
+                $count =Cart::where('user_id','=', $user_id)
+                    ->update([
+                    'count'=> DB::raw('count+1'), 
+                ]);
+            }
+            return redirect('/home');
+            
+        }
+        else
+        {
+            $product_id= $_GET["productId"];
+            echo $product_id;
+            
+        }
     }
 
     /**

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 use App\Models\Product;
+use App\Models\Cart;
 use Illuminate\Http\Request;
+use session;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -26,12 +29,30 @@ class HomeController extends Controller
     {
         $products = Product::all();
 
-        $role = Auth::User()->role;
+        $user_id =  Auth::id();
 
+        $cart = Cart::where('user_id', '=', $user_id)->get('product_id');
+        //return $cart;
+        preg_match_all('!\d+!', $cart, $matches);
+        
+        //print("<pre>".print_r($matches,true)."</pre>");
+        foreach($matches as $match){
+            $count =Cart::where('user_id','=', $user_id)
+                ->update([
+                'count'=> DB::raw('count+1'), 
+            ]);
+        }
+
+        $role = Auth::User()->role;
         if ($role == '1') {
             return view('admin.index');
         }else{
-            return view('index',['products' => $products]);
+           
+        return view('index',['count'=> $count, 'products' => $products]);
+
+        
+
+        
         }
     }
 
