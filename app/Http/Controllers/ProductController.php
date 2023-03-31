@@ -15,7 +15,9 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::all();
-
+        $male_products = Product::where('is_male','=', 1)->get();
+        $female_products = Product::where('is_female','=', 1)->get();
+        //dd($male_products);
         $user_id =  Auth::id();
 
         $cart = Cart::where('user_id', '=', $user_id)->get('product_id');
@@ -30,7 +32,7 @@ class ProductController extends Controller
             ]);
         }
 
-        return view('index',['count'=> $count, 'products' => $products]);
+        return view('index',['count'=> $count, 'maleProducts' => $male_products, 'femaleProducts' => $female_products]);
     }
 
 
@@ -114,13 +116,29 @@ class ProductController extends Controller
             $request->file->store('product', 'public');
 
             // Store the record, using the new file hashname which will be it's new filename identity.
-            $product = new Product([
-                "name" => $request->get('name'),
-                "price" => $request->get('price'),
-                "description" => $request->get('description'),
-                "file_path" => $request->file->hashName()
-            ]);
-            $product->save(); // Finally, save the record.
+            // $product = new Product([
+            //     "name" => $request->get('name'),
+            //     "price" => $request->get('price'),
+            //     "description" => $request->get('description'),
+            //     "file_path" => $request->file->hashName()
+            // ]);
+            // $product->save(); // Finally, save the record.
+            // if($request->male == true){
+            //     return "its male";
+            // }elseif($request->female == true){
+            //     return "its female";
+            // }else{
+            //     return "its not working";
+            // }
+
+            $product = new Product;
+            $product->name = $request->name;
+            $product->description = $request->description;
+            $product->price = $request->price;
+            $product->file_path = $request->file->hashName();
+            $product->is_male = $request->male == true ? true : false;
+            $product->is_female = $request->female == true ? true : false;
+            $product->save();
         }
         $products = Product::all();
 

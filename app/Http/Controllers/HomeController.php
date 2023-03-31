@@ -28,6 +28,8 @@ class HomeController extends Controller
     public function index()
     {
         $products = Product::all();
+        $male_products = Product::where('is_male','=', 1)->get();
+        $female_products = Product::where('is_female','=', 1)->get();
 
         $user_id =  Auth::id();
 
@@ -48,11 +50,7 @@ class HomeController extends Controller
             return view('admin.index');
         }else{
            
-        return view('index',['count'=> $count, 'products' => $products]);
-
-        
-
-        
+            return view('index',['count'=> $count, 'maleProducts' => $male_products, 'femaleProducts' => $female_products]);
         }
     }
 

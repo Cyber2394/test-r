@@ -30,6 +30,17 @@
                 <div class="form-group">
                     <label for="exampleInputEmail">Price</label>
                     <input type="number" class="form-control" name="price" placeholder=" Enter Price*" required>
+                </div>
+                <div class="form-group">
+                    <label for="gender">Gender:</label>
+                    <div class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-primary">
+                        <input type="radio" name="male"> Male
+                        </label>
+                        <label class="btn btn-primary">
+                        <input type="radio" name="female"> Female
+                        </label>
+                    </div>
                 </div>	
 
                 <div>

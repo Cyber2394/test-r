@@ -62,7 +62,7 @@ Route::resource('products', 'App\Http\Controllers\ProductController');
 
 Home routes
 */
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/', [ProductController::class, 'index'])->name('home');
 
 Auth::routes();
 
