@@ -18,23 +18,7 @@ class TestController extends Controller
     public function index()
     {
 
-        $products = Product::all();
-
-        $user_id =  Auth::id();
-
-        $cart = Cart::where('user_id', '=', $user_id)->get('product_id');
-        //return $cart;
-        preg_match_all('!\d+!', $cart, $matches);
-        
-        //print("<pre>".print_r($matches,true)."</pre>");
-        foreach($matches as $match){
-            $count =Cart::where('user_id','=', $user_id)
-                ->update([
-                'count'=> DB::raw('count+1'), 
-            ]);
-        }
-
-        return view('test',['count'=> $count, 'products' => $products]);
+        return view('index_search');
     }
 
     /**

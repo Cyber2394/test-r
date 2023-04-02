@@ -1,4 +1,4 @@
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.sdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.js"></script>
 <html lang="en">
@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>Shop Homepage - Start Bootstrap Template</title>
+    <title>All Dunks Test Server</title>
     <!-- ajax/jquery link -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -40,15 +40,42 @@
                         </ul>
                     </li>
                 </ul>
-                <form class="d-flex">
-                    <a class="btn btn-outline-dark" href="cart">
-                        <i class="bi-cart-fill me-3"></i>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6 offset-md-3">
+                            <form action="{{ route('search') }}" method="GET" id="search-form">
+                                <div class="input-group mb-3">
+                                    <input type="text" name="query" id="search-input" class="form-control" placeholder="Search products...">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" id="search-submit" type="submit">Search</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="rounded" id="search-results"></span>
+                                </div>
+                                
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <style>
+                    #search-results {
+                        position: absolute;
+                        top: 70%;
+                        left: 39%;
+                        width: 20%;
+                        background-color: #fff;
+                    }
+                </style>
 
-                        Cart
-                        <span class="badge bg-dark text-white ms-1 rounded-pill" id="cart">{{$count}}</span>
-                    </a>
 
-                </form>
+                <script src="{{ asset('js/search.js') }}"></script>
+                <a class="btn btn-outline-dark col-1" href="/cart">
+                    <i class="bi-cart-fill "></i>
+
+                    Cart
+                    <span class="badge bg-dark text-white ms-1 rounded-pill" id="cart">{{$count}}</span>
+                </a>
             </div>
         </div>
         <ul class="navbar-nav ms-auto">
@@ -103,7 +130,7 @@
                         <div class="col mb-5">
                             <div class="card h-100">
                                 <!-- Product image-->
-                                <img class="card-img-top" src="{{ URL::asset("storage/product/{$product->file_path}") }}" />
+                                <img class="card-img-top" src="{{ asset('storage/product/' . $product->file_path) }}" alt="Product Image">
                                 <!-- Product details-->
                                 <div class="card-body p-4">
                                     <div class="text-center">
@@ -115,7 +142,7 @@
                                 </div>
                                 <!-- Product actions-->
                                 <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                    <div class="text-center"><button id="addToCart" class="btn btn-outline-dark mt-auto" name="{{$product->id}}" onclick="getId(this.name), counter()">Add to Cart</button></div>
+                                    <div class="text-center"><button id="addToCart" class="btn btn-outline-dark mt-auto" name="{{$product->id}}" onclick="getId(this.name), counter(), checkAuth()">Add to Cart</button></div>
                                 </div>
                             </div>
                         </div>
@@ -144,10 +171,10 @@
                                 </div>
                                 <!-- Product actions-->
                                 <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                    <div class="text-center"><button id="addToCart" class="btn btn-outline-dark mt-auto" name="{{$product->id}}" onclick="getId(this.name), counter()">Add to Cart</button></div>
+                                    <div class="text-center"><button id="addToCart" class="btn btn-outline-dark mt-auto" name="{{$product->id}}" onclick="getId(this.name), counter(), checkAuth()">Add to Cart</button></div>
                                 </div>
                             </div>
-                        </div> 
+                        </div>
                         @endforeach
                     </div>
                 </div>
@@ -172,7 +199,6 @@
     $('#womansSection').hide();
 
     $(document).ready(function() {
-        console.log('start')
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -193,31 +219,53 @@
             $('#womansSection').show('');
             $('#mensSection').show('');
         });
-        
+
     });
 
-    function counter(){
+    function counter() {
         $('#cart').html(function(i, val) {
             return +val + 1
         });
     }
 
-    function getId (id) {
+    function getId(id) {
         //var items = $('#productId').val();
 
-          $.ajax({
+        $.ajax({
             data: {
-              id: id,
+                id: id,
             },
             url: 'addToCart',
             type: "GET",
             success: function(data) {
-              console.log(id);
+                console.log(id);
             },
             error: function(data) {
-              console.log(data)
+                console.log(data)
             }
 
-          });
+        });
+    }
+    //function for when user clicks on search item that pops up while searching
+
+    function search_submit(name) {
+        console.log(name);
+        $.ajax({
+            url: '/products/search_submit',
+            type: 'GET',
+            data: { name: name }
+        });
+    }
+    // check if user is sigend in
+    function checkAuth() {
+        $.ajax({
+            type: 'GET',
+            url: '/check-auth',
+            success: function(data) {},
+            error: function(data) {
+
+                window.location.href = 'http://127.0.0.1:8000/login';
+            }
+        });
     }
 </script>

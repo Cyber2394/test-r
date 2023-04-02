@@ -17,8 +17,6 @@ class CartController extends Controller
      */
     public function index()
     {
-
-        
     }
 
     /**
@@ -32,34 +30,33 @@ class CartController extends Controller
 
     function addToCart(Request $request)
     {
-            //return $request->id;
-            $user_id =  Auth::id();
 
-            //$product_id = $request->input('name');
-            $product_id = $request->id;
-            echo $product_id;
-            $cart = Cart::all();
+        $user_id =  Auth::id();
+        //$product_id = $request->input('name');
+        $product_id = $request->id;
+        echo $product_id;
+        $cart = Cart::all();
 
-            Cart::create([
-                'user_id' =>$user_id,
-                'product_id' => $product_id,
-            ]);
+        Cart::create([
+            'user_id' => $user_id,
+            'product_id' => $product_id,
+        ]);
 
-            $products = Product::all();
+        $products = Product::all();
 
-            $user_id =  Auth::id();
+        $user_id =  Auth::id();
 
-            $cart = Cart::where('user_id', '=', $user_id)->get('product_id');
-            
-            preg_match_all('!\d+!', $cart, $matches);
-            
-            
-            foreach($matches as $match){
-                $count =Cart::where('user_id','=', $user_id)
-                    ->update([
-                    'count'=> DB::raw('count+1'), 
+        $cart = Cart::where('user_id', '=', $user_id)->get('product_id');
+
+        preg_match_all('!\d+!', $cart, $matches);
+
+
+        foreach ($matches as $match) {
+            $count = Cart::where('user_id', '=', $user_id)
+                ->update([
+                    'count' => DB::raw('count+1'),
                 ]);
-            }
+        }
     }
 
     /**
@@ -72,40 +69,39 @@ class CartController extends Controller
         $cart = Cart::where('user_id', '=', $user_id)->get('product_id');
         //return $cart;
         preg_match_all('!\d+!', $cart, $matches);
-        
+
         //print("<pre>".print_r($matches,true)."</pre>");
-        foreach($matches as $match){
-            $count =Cart::where('user_id','=', $user_id)
+        foreach ($matches as $match) {
+            $count = Cart::where('user_id', '=', $user_id)
                 ->update([
-                'count'=> DB::raw('count+1'), 
-            ]);
+                    'count' => DB::raw('count+1'),
+                ]);
         }
-            /**
+        /**
          * eli's solution where he joins the tables somehow
          */
         $products = DB::table('cart')
-        ->join('products', 'cart.product_id', '=' , 'products.id')
-        ->where('cart.user_id',$user_id)
-        ->select('products.*', 'cart.id', 'cart.id as cart_id')
-        ->get();
-        
+            ->join('products', 'cart.product_id', '=', 'products.id')
+            ->where('cart.user_id', $user_id)
+            ->select('products.*', 'cart.id', 'cart.id as cart_id')
+            ->get();
+
         $id = Cart::get();
 
         $price = DB::table('cart')
-        ->join('products', 'cart.product_id', '=' , 'products.id')
-        ->where('cart.user_id',$user_id)
-        ->select('products.price')
-        ->get();
+            ->join('products', 'cart.product_id', '=', 'products.id')
+            ->where('cart.user_id', $user_id)
+            ->select('products.price')
+            ->get();
 
         //return $price;
         preg_match_all('!\d+!', $price, $array);
 
-        foreach($array as $arrays){
+        foreach ($array as $arrays) {
             $sum = array_sum($arrays);
-            
         }
 
-        return view('cart',['carts' => $products, 'count'=> $count, 'ids'=> $id, 'prices'=> $sum]);
+        return view('cart', ['carts' => $products, 'count' => $count, 'ids' => $id, 'prices' => $sum]);
     }
 
     /**
@@ -149,18 +145,18 @@ class CartController extends Controller
         $cart = Cart::where('user_id', '=', $user_id)->get('product_id');
         //return $cart;
         preg_match_all('!\d+!', $cart, $matches);
-        
+
         //print("<pre>".print_r($matches,true)."</pre>");
-        foreach($matches as $match){
-            $count =Cart::where('user_id','=', $user_id)
+        foreach ($matches as $match) {
+            $count = Cart::where('user_id', '=', $user_id)
                 ->update([
-                'count'=> DB::raw('count+1'), 
-            ]);
+                    'count' => DB::raw('count+1'),
+                ]);
         }
         $html = "klsjfljdskf";
-        return response()->json(['html' => $html ,$id]);
-        
-        
+        return response()->json(['html' => $html, $id]);
+
+
         // if(isset($_GET['id'])){
         //     $id = $_GET['id'];
         //     Cart::where('id', '=', $id)->delete();

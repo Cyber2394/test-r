@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,40 +16,39 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::all();
-        $male_products = Product::where('is_male','=', 1)->get();
-        $female_products = Product::where('is_female','=', 1)->get();
+        $male_products = Product::where('is_male', '=', 1)->get();
+        $female_products = Product::where('is_female', '=', 1)->get();
         //dd($male_products);
         $user_id =  Auth::id();
 
         $cart = Cart::where('user_id', '=', $user_id)->get('product_id');
         //return $cart;
         preg_match_all('!\d+!', $cart, $matches);
-        
+
         //print("<pre>".print_r($matches,true)."</pre>");
-        foreach($matches as $match){
-            $count =Cart::where('user_id','=', $user_id)
+        foreach ($matches as $match) {
+            $count = Cart::where('user_id', '=', $user_id)
                 ->update([
-                'count'=> DB::raw('count+1'), 
-            ]);
+                    'count' => DB::raw('count+1'),
+                ]);
         }
 
-        return view('index',['count'=> $count, 'maleProducts' => $male_products, 'femaleProducts' => $female_products]);
+        return view('index', ['count' => $count, 'maleProducts' => $male_products, 'femaleProducts' => $female_products]);
     }
 
 
     function addToCart(Request $request)
     {
-        
-        if(isset($_GET["productId"]) )
-        {
+
+        if (isset($_GET["productId"])) {
             $user_id =  Auth::id();
 
-            $product_id= $_GET["productId"];
+            $product_id = $_GET["productId"];
 
-            
+
 
             Cart::create([
-                'user_id' =>$user_id,
+                'user_id' => $user_id,
                 'product_id' => $product_id,
             ]);
 
@@ -57,27 +57,64 @@ class ProductController extends Controller
             $user_id =  Auth::id();
 
             $cart = Cart::where('user_id', '=', $user_id)->get('product_id');
-            
+
             preg_match_all('!\d+!', $cart, $matches);
-            
-            
-            foreach($matches as $match){
-                $count =Cart::where('user_id','=', $user_id)
+
+
+            foreach ($matches as $match) {
+                $count = Cart::where('user_id', '=', $user_id)
                     ->update([
-                    'count'=> DB::raw('count+1'), 
-                ]);
+                        'count' => DB::raw('count+1'),
+                    ]);
             }
             return redirect('/home');
-            
-        }
-        else
-        {
-            $product_id= $_GET["productId"];
+        } else {
+            $product_id = $_GET["productId"];
             echo $product_id;
-            
         }
     }
 
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+
+        $products = Product::where('name', 'LIKE', "%$query%")->get();
+
+        return response()->json($products);
+    }
+
+    public function searchResult(Request $request)
+    {   
+
+        $query = $request->input('query');
+        //return $query;
+
+        if ($query == '') {
+            return redirect('/');
+        } else {
+
+            $products = Product::where('name', 'LIKE', "%$query%")->get();
+            // $male_products = Product::where('is_male', '=', 1)->get();
+            // $female_products = Product::where('is_female', '=', 1)->get();
+            //dd($male_products);
+            $user_id =  Auth::id();
+
+            $cart = Cart::where('user_id', '=', $user_id)->get('product_id');
+            //return $cart;
+            preg_match_all('!\d+!', $cart, $matches);
+
+            //print("<pre>".print_r($matches,true)."</pre>");
+            foreach ($matches as $match) {
+                $count = Cart::where('user_id', '=', $user_id)
+                    ->update([
+                        'count' => DB::raw('count+1'),
+                    ]);
+            }
+
+            return view('index_search', ['count' => $count, 'Products' => $products]);
+        }
+    }
     /**
      * Show the form for creating a new resource.
      */
@@ -88,9 +125,9 @@ class ProductController extends Controller
         $role = Auth::User()->role;
 
         if ($role == '1') {
-            return view('products.create',['products' => $products]);
+            return view('products.create', ['products' => $products]);
         }
-        
+
 
         //return view('products.create');
     }
@@ -145,9 +182,8 @@ class ProductController extends Controller
         $role = Auth::User()->role;
 
         if ($role == '1') {
-            return view('products.create',['products' => $products]);
+            return view('products.create', ['products' => $products]);
         }
-
     }
     /**
      * Display the specified resource.
@@ -177,34 +213,33 @@ class ProductController extends Controller
      * Remove the specified resource from storage.
      */
 
-     public function destroy_page()
-     {
+    public function destroy_page()
+    {
         $products = Product::all();
 
         $role = Auth::User()->role;
 
         if ($role == '1') {
-            return view('products.destroy',['products' => $products]);
+            return view('products.destroy', ['products' => $products]);
         }
-     }
+    }
 
     public function destroy(Request $request)
     {
         $role = Auth::User()->role;
-        
-        if(isset($_POST['product_id']) && $role == '1'){
-            
+
+        if (isset($_POST['product_id']) && $role == '1') {
+
             $product_id = $_POST['product_id'];
             // echo "this is product id" . $product_id;
             Product::where('id', '=', $product_id)->delete();
-            
+
             $products = Product::all();
 
-                return view('products.destroy',['products' => $products]);
-            
-        }else{
+            return view('products.destroy', ['products' => $products]);
+        } else {
             $products = Product::all();
-            return view('products.create',['products' => $products]);
+            return view('products.create', ['products' => $products]);
         }
     }
 }

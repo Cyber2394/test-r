@@ -28,7 +28,7 @@ Route::resource('test', 'App\Http\Controllers\TestController');
 Route::get('view', [TestController::class, 'index']);
 //Route::post('create', [TestController::class, 'create']);
 
-Route::get('test', [TestController::class, 'create']);
+Route::get('test', [TestController::class, 'index']);
 
 
 /*
@@ -43,7 +43,7 @@ Route::get('addToCart', [CartController::class, 'addToCart']);
 
 /*
 
-Routes for product viewing and creating
+Routes for product viewing, searching and creating
 */
 //Route::post('addToCart', [ProductController::class, 'addToCart']);
 
@@ -53,15 +53,27 @@ Route::post('/products/destroy', [ProductController::class, 'destroy']);
 
 Route::get('/products/destroy_page', [ProductController::class, 'destroy_page']);
 
-Route::get('/view_products', [App\Http\Controllers\HomeController::class, 'view_products']);
+Route::get('/products/search', [ProductController::class, 'search'])->name('search');
+
+Route::get('/products/search_submit', [ProductController::class, 'searchResult'])->name('search');
 
 Route::resource('products', 'App\Http\Controllers\ProductController');
 
+/*
+
+Check auth
+*/
+Route::get('/check-auth', function() {
+    return response()->json(['authenticated' => auth()->check()]);
+})->middleware('auth');
 
 /*
 
 Home routes
 */
+
+Route::get('/view_products', [App\Http\Controllers\HomeController::class, 'view_products']);
+
 Route::get('/', [ProductController::class, 'index'])->name('home');
 
 Auth::routes();
